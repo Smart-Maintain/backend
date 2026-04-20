@@ -4,6 +4,15 @@
 **SmartMaintain** is an industrial predictive maintenance platform. This repository contains the **Identity Service**, which manages authentication, user registration, and security using a Microservices architecture.
 
 ---
+##  Installation & Setup
+**1 Clone the repository:** `git clone [https://github.com/ziyad-benhdouba/front-aerospace-predictive-maintenance.git](https://github.com/ziyad-benhdouba/front-aerospace-predictive-maintenance.git)`
+
+
+**2 Configure Database: Update**  `src/main/resources/application.yml`  with your DB credentials.
+
+**3 Run with Maven:** `mvn spring-boot:run`
+
+
 
 ##  Features
 * **JWT Authentication**: Secure login using HS256 algorithm.
