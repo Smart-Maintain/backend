@@ -10,20 +10,23 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 @Transactional
 public class AccountService implements UserDetailsService {
 
     @Autowired
     private UtilisateurRepository utilisateurRepository;
+
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Utilisateur user = utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Email ma-kaynch: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("Email makaynchii: " + email));
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
@@ -33,23 +36,46 @@ public class AccountService implements UserDetailsService {
     }
 
 
-    public Client saveClient(Client client) {
 
-        client.setMotDePasse(passwordEncoder.encode(client.getMotDePasse()));
+    public List<Utilisateur> getAllUsers() {
+        return utilisateurRepository.findAll();
+    }
 
-        return utilisateurRepository.save(client);
+    public Utilisateur updateUser(UUID id, Utilisateur userDetails) {
+        Utilisateur user = utilisateurRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        user.setNom(userDetails.getNom());
+        user.setPrenom(userDetails.getPrenom());
+        user.setEmail(userDetails.getEmail());
+
+        if (userDetails.getMotDePasse() != null && !userDetails.getMotDePasse().isEmpty()) {
+            user.setMotDePasse(passwordEncoder.encode(userDetails.getMotDePasse()));
+        }
+
+        return utilisateurRepository.save(user);
+    }
+
+    public void deleteUser(UUID id) {
+        utilisateurRepository.deleteById(id);
+    }
+
+    public List<Utilisateur> getUsersByRole(String role) {
+        return utilisateurRepository.findByRole(role);
     }
 
 
-    public Admin saveAdmin(Admin admin) {
+    public Client saveClient(Client client) {
+        client.setMotDePasse(passwordEncoder.encode(client.getMotDePasse()));
+        return utilisateurRepository.save(client);
+    }
 
-        String encodedPassword = passwordEncoder.encode(admin.getMotDePasse());
-        admin.setMotDePasse(encodedPassword);
+    public Admin saveAdmin(Admin admin) {
+        admin.setMotDePasse(passwordEncoder.encode(admin.getMotDePasse()));
         return utilisateurRepository.save(admin);
     }
 
     public Manager saveManager(Manager manager) {
-
         manager.setMotDePasse(passwordEncoder.encode(manager.getMotDePasse()));
         return utilisateurRepository.save(manager);
     }

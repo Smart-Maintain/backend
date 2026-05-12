@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/smartmaintain_db
-    username: karima
-    password: karima123
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/identity_db}
+    username: ${SPRING_DATASOURCE_USERNAME:karima}
+    password: ${SPRING_DATASOURCE_PASSWORD:karima123}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

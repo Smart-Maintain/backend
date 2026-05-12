@@ -7,6 +7,7 @@ import com.smartmaintain.identityservice.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,8 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/account")
@@ -29,18 +32,15 @@ public class AccountController {
     @Autowired
     private JwtEncoder jwtEncoder;
 
+    // Login Endpoint
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        System.out.println("--- Jarrebna Login b: " + request.email() + " ---");
         try {
-            // 1. Authentification
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
             );
 
-
             String role = auth.getAuthorities().iterator().next().getAuthority();
-
 
             JwsHeader jwsHeader = JwsHeader.with(MacAlgorithm.HS256).build();
 
@@ -52,29 +52,64 @@ public class AccountController {
                     .expiresAt(Instant.now().plusSeconds(36000))
                     .build();
 
-
             String token = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
 
             return ResponseEntity.ok(new LoginResponse(token, role));
 
         } catch (Exception e) {
-            System.out.println("--- failed-LOGIN: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Les identifications sont erronées");
         }
     }
 
+
+
+    @GetMapping("/users")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Utilisateur> listUsers() {
+        return accountService.getAllUsers();
+    }
+    @GetMapping("/users/role/{role}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Utilisateur> getUsersByRole(@PathVariable String role) {
+        return accountService.getUsersByRole(role);
+    }
+
+    @PutMapping("/users/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Utilisateur editUser(@PathVariable UUID id, @RequestBody Utilisateur userDetails) {
+        return accountService.updateUser(id, userDetails);
+    }
+
+    @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void deleteUser(@PathVariable UUID id) {
+        accountService.deleteUser(id);
+    }
+
+
+
     @PostMapping("/admin")
-    public Admin createAdmin(@RequestBody Admin admin) { return accountService.saveAdmin(admin); }
-
+    public Admin addAdmin(@RequestBody Admin admin) {
+        return accountService.saveAdmin(admin);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/client")
-    public Client createClient(@RequestBody Client client) { return accountService.saveClient(client); }
-
+    public Client addClient(@RequestBody Client client) {
+        return accountService.saveClient(client);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/manager")
-    public Manager createManager(@RequestBody Manager manager) { return accountService.saveManager(manager); }
-
+    public Manager addManager(@RequestBody Manager manager) {
+        return accountService.saveManager(manager);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/ingenieur")
-    public Ingenieur createIngenieur(@RequestBody Ingenieur ingenieur) { return accountService.saveIngenieur(ingenieur); }
-
+    public Ingenieur addIngenieur(@RequestBody Ingenieur ingenieur) {
+        return accountService.saveIngenieur(ingenieur);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/operateur")
-    public Operateur createOperateur(@RequestBody Operateur operateur) { return accountService.saveOperateur(operateur); }
+    public Operateur addOperateur(@RequestBody Operateur operateur) {
+        return accountService.saveOperateur(operateur);
+    }
 }
