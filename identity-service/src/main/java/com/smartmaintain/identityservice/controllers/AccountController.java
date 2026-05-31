@@ -17,11 +17,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/account")
 public class AccountController {
+
+    private static final Logger log = LoggerFactory.getLogger(AccountController.class);
 
     @Autowired
     private AccountService accountService;
@@ -36,6 +41,7 @@ public class AccountController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
+            log.info("Login attempt for email={}", request.email());
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
             );
@@ -53,23 +59,23 @@ public class AccountController {
                     .build();
 
             String token = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-
             return ResponseEntity.ok(new LoginResponse(token, role));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Les identifications sont erronées");
+            log.warn("Authentication failed for {}: {}", request.email(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
         }
     }
 
 
 
     @GetMapping("/users")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public List<Utilisateur> listUsers() {
         return accountService.getAllUsers();
     }
     @GetMapping("/users/role/{role}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public List<Utilisateur> getUsersByRole(@PathVariable String role) {
         return accountService.getUsersByRole(role);
     }
@@ -78,6 +84,12 @@ public class AccountController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public Utilisateur editUser(@PathVariable UUID id, @RequestBody Utilisateur userDetails) {
         return accountService.updateUser(id, userDetails);
+    }
+
+    @PutMapping("/users/{id}/status/{status}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Utilisateur updateUserStatus(@PathVariable UUID id, @PathVariable String status) {
+        return accountService.updateUserStatus(id, status);
     }
 
     @DeleteMapping("/users/{id}")
@@ -92,22 +104,22 @@ public class AccountController {
     public Admin addAdmin(@RequestBody Admin admin) {
         return accountService.saveAdmin(admin);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping("/client")
     public Client addClient(@RequestBody Client client) {
         return accountService.saveClient(client);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping("/manager")
     public Manager addManager(@RequestBody Manager manager) {
         return accountService.saveManager(manager);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping("/ingenieur")
     public Ingenieur addIngenieur(@RequestBody Ingenieur ingenieur) {
         return accountService.saveIngenieur(ingenieur);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping("/operateur")
     public Operateur addOperateur(@RequestBody Operateur operateur) {
         return accountService.saveOperateur(operateur);

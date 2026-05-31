@@ -14,6 +14,6 @@ import java.util.UUID;
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, UUID> {
     Optional<Utilisateur> findByEmail(String email);
 
-    @Query("SELECT u FROM Utilisateur u WHERE TYPE(u) = :type")
+    @Query(value = "SELECT * FROM utilisateurs WHERE role = :type", nativeQuery = true)
     List<Utilisateur> findByRole(@Param("type") String type);
 }

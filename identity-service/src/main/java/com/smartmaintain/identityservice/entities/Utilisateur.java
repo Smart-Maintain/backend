@@ -22,6 +22,7 @@ public  abstract class Utilisateur {
     @Column(unique = true)
     private String email;
     private String motDePasse;
+    private String accountStatus;
 
     @Transient
     public String getRole() {
@@ -34,6 +35,7 @@ public  abstract class Utilisateur {
         this.nom = nom;
         this.email = email;
         this.motDePasse = motDePasse;
+        this.accountStatus = "PENDING_APPROVAL";
     }
 
     public Utilisateur() {
@@ -77,5 +79,13 @@ public  abstract class Utilisateur {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public String getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(String accountStatus) {
+        this.accountStatus = accountStatus;
     }
 }

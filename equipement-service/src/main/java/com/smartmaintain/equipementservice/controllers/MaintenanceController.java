@@ -1,5 +1,6 @@
 package com.smartmaintain.equipementservice.controllers;
 
+import com.smartmaintain.equipementservice.dto.MaintenanceRequest;
 import com.smartmaintain.equipementservice.entities.Maintenance;
 import com.smartmaintain.equipementservice.services.MaintenanceService;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,19 @@ public class MaintenanceController {
 
     @GetMapping("/{id}")
     public Maintenance getById(@PathVariable UUID id) { return service.getById(id); }
+
+    @PostMapping
+    public Maintenance create(@RequestBody MaintenanceRequest request) { return service.create(request); }
+
+    @PutMapping("/{id}")
+    public Maintenance update(@PathVariable UUID id, @RequestBody MaintenanceRequest request) {
+        return service.update(id, request);
+    }
+
+    @PutMapping("/{id}/team/{equipeId}")
+    public Maintenance assignTeam(@PathVariable UUID id, @PathVariable UUID equipeId) {
+        return service.assignTeam(id, equipeId);
+    }
 
     @PutMapping("/{id}/validate")
     public Maintenance validate(@PathVariable UUID id) { return service.changeStatus(id, "VALIDATED"); }

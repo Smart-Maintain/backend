@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface TacheRepository extends JpaRepository<Tache, UUID> {
     List<Tache> findByTaxonomieId(Long taxonomieId);
+    List<Tache> findByMaintenanceId(UUID maintenanceId);
 }

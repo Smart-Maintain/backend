@@ -1,6 +1,7 @@
 package com.smartmaintain.equipementservice.entities;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -12,10 +13,17 @@ public class Tache {
     private String description;
     private String priorite;
     private String status;
+    @Column(length = 2000)
+    private String technicianNote;
+    private LocalDateTime checkedAt;
 
     @ManyToOne
     @JoinColumn(name = "equipe_id")
     private Equipe equipe;
+
+    @ManyToOne
+    @JoinColumn(name = "maintenance_id")
+    private Maintenance maintenance;
 
     public Tache() {}
 
@@ -66,7 +74,39 @@ public class Tache {
     public void setEquipe(Equipe equipe) {
         this.equipe = equipe;
     }
+
+    public String getTechnicianNote() {
+        return technicianNote;
+    }
+
+    public void setTechnicianNote(String technicianNote) {
+        this.technicianNote = technicianNote;
+    }
+
+    public LocalDateTime getCheckedAt() {
+        return checkedAt;
+    }
+
+    public void setCheckedAt(LocalDateTime checkedAt) {
+        this.checkedAt = checkedAt;
+    }
+
+    public Maintenance getMaintenance() {
+        return maintenance;
+    }
+
+    public void setMaintenance(Maintenance maintenance) {
+        this.maintenance = maintenance;
+    }
     @ManyToOne
     @JoinColumn(name = "taxonomie_id")
     private Taxonomie taxonomie;
+
+    public Taxonomie getTaxonomie() {
+        return taxonomie;
+    }
+
+    public void setTaxonomie(Taxonomie taxonomie) {
+        this.taxonomie = taxonomie;
+    }
 }

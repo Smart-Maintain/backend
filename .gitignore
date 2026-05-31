@@ -1,5 +1,11 @@
 # Exclude .env files anywhere in the project
 **/.env
+**/.venv/
+**/__pycache__/**
+*.pyc
+**/*.log
+identity_last_tail.txt
+identity_latest_tail.txt
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
