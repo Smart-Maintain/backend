@@ -66,7 +66,7 @@ def generate_pdf(vulns, filename="rapport-securite.pdf"):
     text_style = ParagraphStyle('TextStyle', parent=styles['Normal'], fontSize=10, spaceAfter=10)
     
     story.append(Paragraph("Rapport Global Audits de Sécurité DevSecOps", title_style))
-    story.append(Paragraph(f"Projet : identity-service-aerospace", text_style))
+    story.append(Paragraph(f"Projet : smart-maintain-backend", text_style))
     story.append(Paragraph(f"Total des vulnérabilités recensées : <b>{len(vulns)}</b>", text_style))
     story.append(Spacer(1, 15))
     
@@ -100,7 +100,7 @@ def send_telegram_pdf(pdf_path, total_count):
         return
     
     text_url = f"https://api.telegram.org/bot{token}/sendMessage"
-    msg = f"🛡️ *Rapport de Sécurité DevSecOps*\n📌 *Projet:* `identity-service-aerospace`\n\n🚨 L'analyse complète est terminée. *{total_count}* vulnérabilités globales ont été trouvées. Voir le PDF ci-joint pour le détail."
+    msg = f"🛡️ *Rapport de Sécurité DevSecOps*\n📌 *Projet:* `smart-maintain-backend`\n\n🚨 L'analyse complète est terminée. *{total_count}* vulnérabilités globales ont été trouvées. Voir le PDF ci-joint pour le détail."
     requests.post(text_url, json={"chat_id": chat_id, "text": msg, "parse_mode": "Markdown"})
     
     doc_url = f"https://api.telegram.org/bot{token}/sendDocument"
